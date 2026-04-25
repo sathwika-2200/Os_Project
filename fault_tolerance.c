@@ -1,11 +1,9 @@
-/* ============================================================
-   fault_tolerance.c  -  MODULE 3: Fault Tolerance & Recovery
+/*fault_tolerance.c  -  MODULE 3: Fault Tolerance & Recovery
    OS Project - Distributed File System
    ============================================================
    Responsibilities:
      * Heartbeat check - ping every node, report dead ones
-     * Auto-rebuild lost replicas on available healthy nodes
-   ============================================================ */
+     * Auto-rebuild lost replicas on available healthy nodes*/
 
 #include "dfs.h"
 

@@ -1,7 +1,5 @@
-/* ============================================================
-   dfs.h  -  Distributed File System: Shared Types & Constants
-   OS Project | All three modules include this header
-   ============================================================ */
+/*dfs.h  -  Distributed File System: Shared Types & Constants
+   OS Project | All three modules include this header*/
 
 #ifndef DFS_H
 #define DFS_H

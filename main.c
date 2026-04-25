@@ -1,11 +1,9 @@
-/* ============================================================
-   main.c  -  Distributed File System: Interactive Main Menu
+/*main.c  -  Distributed File System: Interactive Main Menu
    OS Project
    ============================================================
    Ties together all 3 modules with a numbered CLI menu.
    Compile:  gcc main.c node_manager.c replication.c fault_tolerance.c -o dfs
-   Run:      ./dfs   (Linux/Mac)   |   dfs.exe   (Windows)
-   ============================================================ */
+   Run:      ./dfs   (Linux/Mac)   |   dfs.exe   (Windows)*/
 
 #include "dfs.h"
 

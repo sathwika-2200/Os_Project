@@ -1,12 +1,10 @@
-/* ============================================================
-   node_manager.c  -  MODULE 1: Node Manager
+/*node_manager.c  -  MODULE 1: Node Manager
    OS Project - Distributed File System
    ============================================================
    Responsibilities:
      * Create / initialise virtual nodes
      * Crash (simulate failure) and recover nodes
-     * Display live node status table
-   ============================================================ */
+     * Display live node status table*/
 
 #include "dfs.h"
 

@@ -1,5 +1,4 @@
-/* ============================================================
-   replication.c  -  MODULE 2: Replication & Consistency Engine
+/*replication.c  -  MODULE 2: Replication & Consistency Engine
    OS Project - Distributed File System
    ============================================================
    Responsibilities:
@@ -7,8 +6,7 @@
      * Read file from nearest available (first online) node
      * Sync a recovered node's files from the registry
      * Check data consistency across all nodes
-     * Display the replication map
-   ============================================================ */
+     * Display the replication map*/
 
 #include "dfs.h"
 
