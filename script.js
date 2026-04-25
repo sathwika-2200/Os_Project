@@ -1,6 +1,7 @@
 // // SCRIPT.JS — Distributed File System Dashboard v3
 // Module 1: Node Manager | Module 2: Replication | Module 3: Fault Tolerance
-// const REPLICATION_FACTOR = 3;
+const REPLICATION_FACTOR = 3;
+
 // State (window-scoped for cross-script access)
 window.nodes = [
   { id: 'N1', status: 'online', files: [], load: 22 },

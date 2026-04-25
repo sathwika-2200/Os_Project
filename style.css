@@ -269,6 +269,40 @@ input { background: #0d1117; border: 1px solid var(--panel-border); color: white
 .lg.er { color: var(--red); }
 .lg.in { color: var(--accent); }
 
+/* Overlays */
+.overlay-bg {
+  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  background: rgba(0,0,0,0.8); backdrop-filter: blur(4px);
+  z-index: 1000; display: none; opacity: 0; transition: opacity 0.3s;
+}
+
+.node-overlay {
+  position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0.9);
+  width: 400px; background: var(--panel); border: 2px solid var(--accent);
+  box-shadow: 0 0 30px var(--accent-glow); border-radius: 12px;
+  z-index: 1001; opacity: 0; pointer-events: none; transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  padding: 2rem;
+}
+
+.nov-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
+.nov-id { font-size: 1.5rem; font-weight: 800; color: var(--accent); font-family: 'JetBrains Mono', monospace; }
+
+.nov-row { margin-bottom: 1rem; }
+.nov-label { color: var(--text-dim); font-size: 0.75rem; text-transform: uppercase; font-weight: 800; display: block; margin-bottom: 4px; letter-spacing: 0.05em; }
+
+.nov-actions { display: flex; gap: 10px; margin-top: 2rem; }
+.nov-btn { 
+  flex: 1; padding: 10px; border-radius: 6px; 
+  border: 1px solid var(--panel-border); background: #21262d; 
+  color: white; cursor: pointer; font-size: 12px; font-weight: 700; 
+  transition: 0.2s; 
+}
+.nov-btn.crash { border-color: var(--ora); color: var(--ora); }
+.nov-btn.crash:hover { background: var(--ora); color: black; box-shadow: 0 0 15px var(--ora); }
+.nov-btn.delete { border-color: var(--red); color: var(--red); }
+.nov-btn.delete:hover { background: var(--red); color: white; box-shadow: 0 0 15px var(--red); }
+.nov-btn.close { background: #30363d; border-color: #484f58; }
+
 /* CUSTOM DARK SCROLLBARS */
 ::-webkit-scrollbar { width: 8px; }
 ::-webkit-scrollbar-track { background: var(--bg); }

@@ -146,25 +146,25 @@
 <!-- Toast -->
 <div id="toast"></div>
 
-<!-- Node Info Overlay -->
-<div id="node-overlay" class="node-overlay" style="opacity:0;pointer-events:none;">
-  <div class="nov-header">
-    <span class="nov-id" id="nov-id">N1</span>
-    <span class="nov-badge" id="nov-badge">ONLINE</span>
-    <button class="nov-close" onclick="closeOverlay()">✕</button>
-  </div>
-  <div class="nov-body">
-    <div class="nov-row"><span class="nov-lbl">Status</span><span id="nov-status">—</span></div>
-    <div class="nov-row"><span class="nov-lbl">Load</span><span id="nov-load">—</span></div>
-    <div class="nov-row"><span class="nov-lbl">Files</span><span id="nov-files">—</span></div>
-    <div class="nov-row"><span class="nov-lbl">Replicas</span><span id="nov-replicas">—</span></div>
-  </div>
-  <div class="nov-actions">
-    <button class="nov-btn nov-crash"  id="nov-btn-crash"   onclick="overlayToggle()">Crash Node</button>
-    <button class="nov-btn nov-delete" id="nov-btn-delete"  onclick="overlayDelete()">Delete Node</button>
-  </div>
-</div>
-<div id="overlay-bg" class="overlay-bg" style="display:none;" onclick="closeOverlay()"></div>
+    <!-- Node Details Overlay -->
+    <div class="overlay-bg" id="overlay-bg" onclick="closeOverlay()"></div>
+    <div class="node-overlay" id="node-overlay">
+        <div class="nov-header">
+            <span class="nov-id" id="nov-id">N1</span>
+            <span class="nov-badge" id="nov-badge">ONLINE</span>
+        </div>
+        <div class="nov-body">
+            <div class="nov-row"><span class="nov-label">Status:</span> <span id="nov-status">online</span></div>
+            <div class="nov-row"><span class="nov-label">Disk Load:</span> <span id="nov-load">22%</span></div>
+            <div class="nov-row"><span class="nov-label">Stored Files:</span> <div id="nov-files" class="nov-files"></div></div>
+            <div class="nov-row"><span class="nov-label">Replicas of:</span> <div id="nov-replicas" class="nov-files"></div></div>
+        </div>
+        <div class="nov-actions">
+            <button class="nov-btn crash" id="nov-btn-crash" onclick="overlayToggle()">⚡ Crash Node</button>
+            <button class="nov-btn delete" onclick="overlayDelete()">✗ Delete Node</button>
+            <button class="nov-btn close" onclick="closeOverlay()">Close</button>
+        </div>
+    </div>
 
 <script src="script.js?v=5"></script>
 <script>
