@@ -13,6 +13,8 @@ window.nodes = [
 window.fileRegistry = {};
 window.fileContents = {};
 window.nodeCounter  = 6;
+window.consistencyMode = 'eventual';
+window.isPartitioned = false;
 
 // Clock
 function tickClock() {
@@ -54,15 +56,23 @@ function updateStats() {
   document.getElementById('s-files').textContent   = files;
   document.getElementById('node-count-label').textContent = `${nodes.length} node${nodes.length !== 1 ? 's' : ''}`;
 
+  // Quorum Calculation (Majority required for "Healthy" status)
+  const quorumPill = document.getElementById('quorum-pill');
+  const required = Math.floor(nodes.length / 2) + 1;
+  if (quorumPill) {
+    quorumPill.textContent = `QUORUM: ${online}/${nodes.length}`;
+    quorumPill.className = online >= required ? 'pill q' : 'pill r';
+  }
+
   const pill = document.getElementById('net-pill');
-  if (offline === nodes.length) {
-    pill.textContent = '● NETWORK DOWN';
+  if (online < required) {
+    pill.textContent = '● QUORUM LOST';
     pill.className   = 'pill r';
   } else if (offline > 0) {
     pill.textContent = '● DEGRADED';
     pill.className   = 'pill o';
   } else {
-    pill.textContent = '● NETWORK ACTIVE';
+    pill.textContent = '● CLUSTER HEALTHY';
     pill.className   = 'pill g';
   }
 }
@@ -131,7 +141,7 @@ function renderRepMap() {
   }).join('');
 }
 
-// Draw Server Rack (Replaces Topology)
+// Draw Server Rack (Industrial Blade Center style)
 function drawTopology() {
   const rack = document.getElementById('datacenter-rack');
   if (!rack) return;
@@ -143,20 +153,30 @@ function drawTopology() {
     blade.id = `blade-${node.id}`;
     blade.onclick = (e) => { e.stopPropagation(); toggleNode(node.id); };
 
-    const numDisks = Math.min(6, node.files.length);
+    // LED status indicators
+    const ledClass = node.status === 'online' ? 'active' : 'error';
+    
+    // Disk occupancy bays (Max 6 for visualization)
     let disksHtml = '';
-    for(let i=0; i<6; i++) {
-        disksHtml += `<div class="bdisk ${i < numDisks ? 'filled' : ''}"></div>`;
+    const fileCount = node.files.length;
+    for (let i = 0; i < 6; i++) {
+      const fillHeight = i < fileCount ? '100%' : '0%';
+      disksHtml += `
+        <div class="disk-slot">
+          <div class="disk-fill" style="height: ${fillHeight}"></div>
+        </div>`;
     }
 
     blade.innerHTML = `
-      <div class="blade-handle"></div>
       <div class="blade-id">${node.id}</div>
       <div class="blade-leds">
-        <div class="bled b-power"></div>
-        <div class="bled b-act"></div>
+        <div class="led ${ledClass}"></div>
+        <div class="led ${node.load > 80 ? 'warn' : ''}"></div>
+        <div class="led active" style="animation-delay: ${Math.random()}s"></div>
       </div>
-      <div class="blade-disks">${disksHtml}</div>
+      <div class="blade-disks">
+        ${disksHtml}
+      </div>
     `;
     rack.appendChild(blade);
   });
@@ -543,13 +563,51 @@ setInterval(() => {
   }
 }, 15000);
 
+// ANTI-NEXUS FEATURES
+
+// Toggle Consistency Mode
+function setConsistency(mode) {
+  window.consistencyMode = mode;
+  document.getElementById('mode-eventual').classList.toggle('active', mode === 'eventual');
+  document.getElementById('mode-strong').classList.toggle('active', mode === 'strong');
+  
+  log(`⚙ Consistency changed to: ${mode.toUpperCase()}`, 'in');
+  toast(`Mode: ${mode.toUpperCase()}`);
+}
+
+// Network Partition Simulation
+function togglePartition() {
+  window.isPartitioned = !window.isPartitioned;
+  const btn = document.getElementById('btn-partition');
+  
+  if (window.isPartitioned) {
+    // Partition: Split N1-N2 from N3-N5
+    nodes.forEach((n, index) => {
+      if (index < 2) n.status = 'offline'; 
+    });
+    btn.innerHTML = '<span class="sbi">🔗</span>Heal Partition';
+    btn.style.borderColor = 'var(--grn)';
+    log('⚠  NETWORK PARTITION: Cluster split detected! Majority quorum lost.', 'er');
+    toast('Partitioned!', true);
+  } else {
+    nodes.forEach(n => n.status = 'online');
+    btn.innerHTML = '<span class="sbi">⛓</span>Network Partition';
+    btn.style.borderColor = '';
+    log('✓  NETWORK HEALED: Cluster communication restored.', 'ok');
+    toast('Healed!');
+  }
+  renderNodes();
+}
+
 // Expose globals for inline override script
-window.log          = log;
-window.toast        = toast;
-window.syncNode     = syncNode;
-window.renderNodes  = renderNodes;
-window.deleteNode   = deleteNode;
-window.deleteFile   = deleteFile;
+window.log              = log;
+window.toast            = toast;
+window.syncNode         = syncNode;
+window.renderNodes      = renderNodes;
+window.deleteNode       = deleteNode;
+window.deleteFile       = deleteFile;
+window.setConsistency   = setConsistency;
+window.togglePartition  = togglePartition;
 
 // Init
 renderNodes();

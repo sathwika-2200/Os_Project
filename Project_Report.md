@@ -33,9 +33,13 @@ The system is divided into three core modules:
     *   **Load-Aware Routing:** Before saving a file, the system calculates the current disk load of all active servers and routes data to the nodes with the most free space.
     *   Uses a Replication Factor of 3 (RF=3) to ensure data safety.
 
-*   **Module 3: Fault Tolerance & Recovery**
-    *   Simulates a heartbeat check to identify offline nodes.
-    *   **Self-Healing:** If a replica is lost, the system automatically duplicates the remaining healthy data to new nodes to restore the replication count.
+*   **Module 3: Fault Tolerance & Quorum Management**
+    *   **Quorum Monitoring:** Implements a consensus check where the system requires >50% of nodes to be healthy to perform operations (Majority Quorum).
+    *   **Network Partition Simulation:** A button that simulates a physical network split, testing how the system handles a loss of quorum.
+    *   **Self-Healing:** Automated rebuilds of lost replicas.
+
+*   **Module 4: Distributed Consistency (Advanced)**
+    *   **Consistency Mode Toggle:** Allows switching between **Strong Consistency** (high safety) and **Eventual Consistency** (high performance) to demonstrate core distributed systems trade-offs.
 
 ---
 
