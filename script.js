@@ -1,11 +1,7 @@
-// ============================================================
-// SCRIPT.JS — Distributed File System Dashboard v3
+// // SCRIPT.JS — Distributed File System Dashboard v3
 // Module 1: Node Manager | Module 2: Replication | Module 3: Fault Tolerance
-// ============================================================
-
-const REPLICATION_FACTOR = 3;
-
-// ── State (window-scoped for cross-script access) ─────────────
+// const REPLICATION_FACTOR = 3;
+// State (window-scoped for cross-script access)
 window.nodes = [
   { id: 'N1', status: 'online', files: [], load: 22 },
   { id: 'N2', status: 'online', files: [], load: 38 },
@@ -18,7 +14,7 @@ window.fileRegistry = {};
 window.fileContents = {};
 window.nodeCounter  = 6;
 
-// ── Clock ────────────────────────────────────────────────────
+// Clock
 function tickClock() {
   const el = document.getElementById('time-pill');
   if (el) el.textContent = new Date().toLocaleTimeString('en-GB');
@@ -26,7 +22,7 @@ function tickClock() {
 setInterval(tickClock, 1000);
 tickClock();
 
-// ── Logging ──────────────────────────────────────────────────
+// Logging
 function log(msg, type = 'info') {
   const term = document.getElementById('terminal');
   const div  = document.createElement('div');
@@ -37,7 +33,7 @@ function log(msg, type = 'info') {
   term.scrollTop = term.scrollHeight;
 }
 
-// ── Toast ─────────────────────────────────────────────────────
+// Toast
 function toast(msg, isErr = false) {
   const el = document.getElementById('toast');
   el.textContent = msg;
@@ -46,7 +42,7 @@ function toast(msg, isErr = false) {
   el._t = setTimeout(() => { el.className = ''; }, 3200);
 }
 
-// ── Update Header Stats + Pills ───────────────────────────────
+// Update Header Stats + Pills
 function updateStats() {
   const online  = nodes.filter(n => n.status === 'online').length;
   const offline = nodes.length - online;
@@ -71,7 +67,7 @@ function updateStats() {
   }
 }
 
-// ── Render Node Grid ──────────────────────────────────────────
+// Render Node Grid
 function renderNodes() {
   const grid = document.getElementById('node-grid');
   grid.innerHTML = '';
@@ -109,7 +105,7 @@ function renderNodes() {
   drawTopology();
 }
 
-// ── Render Replication Map (Sidebar) ──────────────────────────
+// Render Replication Map (Sidebar)
 function renderRepMap() {
   const map   = document.getElementById('rep-map');
   const files = Object.keys(fileRegistry);
@@ -135,7 +131,7 @@ function renderRepMap() {
   }).join('');
 }
 
-// ── Draw Server Rack (Replaces Topology) ──────────────────────
+// Draw Server Rack (Replaces Topology)
 function drawTopology() {
   const rack = document.getElementById('datacenter-rack');
   if (!rack) return;
@@ -166,7 +162,7 @@ function drawTopology() {
   });
 }
 
-// ── MODULE 1: Toggle Node — now opens overlay ────────────────
+// MODULE 1: Toggle Node — now opens overlay
 let _overlayNodeId = null;
 
 function toggleNode(id) {
@@ -239,7 +235,7 @@ function closeOverlay() {
   bgEl.style.display = 'none';
 }
 
-// ── Delete Node ───────────────────────────────────────────────
+// Delete Node
 function deleteNode(id) {
   window.nodes = window.nodes.filter(n => n.id !== id);
   Object.keys(window.fileRegistry).forEach(f => {
@@ -254,7 +250,7 @@ function deleteNode(id) {
   renderNodes();
 }
 
-// ── Delete File ───────────────────────────────────────────────
+// Delete File
 function deleteFile() {
   const fname = document.getElementById('rname').value.trim();
   if (!fname) { toast('Enter a file name to delete!', true); return; }
@@ -275,7 +271,7 @@ function deleteFile() {
   renderNodes();
 }
 
-// ── MODULE 1: Add Node ────────────────────────────────────────
+// MODULE 1: Add Node
 function addNode() {
   const id = `N${nodeCounter++}`;
   nodes.push({ id, status: 'online', files: [], load: 5 });
@@ -284,14 +280,14 @@ function addNode() {
   renderNodes();
 }
 
-// ── MODULE 1: Refresh ────────────────────────────────────────
+// MODULE 1: Refresh
 function refreshAll() {
   log('↻ Refreshing node status map…', 'info');
   renderNodes();
   toast('Status refreshed!');
 }
 
-// ── MODULE 1: Crash Random ────────────────────────────────────
+// MODULE 1: Crash Random
 function crashRandom() {
   const online = nodes.filter(n => n.status === 'online');
   if (!online.length) { toast('No online nodes!', true); return; }
@@ -302,7 +298,7 @@ function crashRandom() {
   renderNodes();
 }
 
-// ── MODULE 1: Crash All ───────────────────────────────────────
+// MODULE 1: Crash All
 function crashAll() {
   nodes.forEach(n => n.status = 'offline');
   log('⚠  CRITICAL: ALL NODES OFFLINE — System unavailable!', 'er');
@@ -310,7 +306,7 @@ function crashAll() {
   renderNodes();
 }
 
-// ── MODULE 1: Recover All ─────────────────────────────────────
+// MODULE 1: Recover All
 function recoverAll() {
   let count = 0;
   nodes.forEach(n => {
@@ -321,7 +317,7 @@ function recoverAll() {
   renderNodes();
 }
 
-// ── MODULE 2: Sync a single node ─────────────────────────────
+// MODULE 2: Sync a single node
 function syncNode(id) {
   const n = nodes.find(x => x.id === id);
   if (!n || n.status !== 'online') return;
@@ -338,7 +334,7 @@ function syncNode(id) {
   }
 }
 
-// ── MODULE 2: Sync All ────────────────────────────────────────
+// MODULE 2: Sync All
 function syncNodes() {
   nodes.filter(n => n.status === 'online').forEach(n => syncNode(n.id));
   log('⇌ Full network sync complete. All online nodes up to date.', 'ok');
@@ -346,7 +342,7 @@ function syncNodes() {
   renderNodes();
 }
 
-// ── Datacenter Rack Data-Flow Animation ───────────────────────
+// Datacenter Rack Data-Flow Animation
 function animateDataFlow(targetIds) {
   const rack = document.getElementById('datacenter-rack');
   if (!rack) return;
@@ -397,7 +393,7 @@ function animateDataFlow(targetIds) {
   }, 700);
 }
 
-// ── MODULE 2: Write File ──────────────────────────────────────
+// MODULE 2: Write File
 function writeFile() {
   const fname   = document.getElementById('fname').value.trim();
   const content = document.getElementById('fcont').value.trim();
@@ -430,7 +426,7 @@ function writeFile() {
   renderNodes();
 }
 
-// ── MODULE 2: Read File ───────────────────────────────────────
+// MODULE 2: Read File
 function readFile() {
   const fname  = document.getElementById('rname').value.trim();
   const result = document.getElementById('read-res');
@@ -461,7 +457,7 @@ function readFile() {
   toast(`Read from ${avail.id} OK!`);
 }
 
-// ── MODULE 2: Check Consistency ───────────────────────────────
+// MODULE 2: Check Consistency
 function checkConsistency() {
   let issues = 0;
   log('--- Consistency check started ---', 'dm');
@@ -484,7 +480,7 @@ function checkConsistency() {
   log('--- Consistency check done ---', 'dm');
 }
 
-// ── MODULE 3: Heartbeat Check ─────────────────────────────────
+// MODULE 3: Heartbeat Check
 function heartbeatCheck() {
   log('--- Heartbeat check started ---', 'dm');
   nodes.forEach(n => {
@@ -498,7 +494,7 @@ function heartbeatCheck() {
   toast('Heartbeat check complete.');
 }
 
-// ── MODULE 3: Rebuild Replicas ────────────────────────────────
+// MODULE 3: Rebuild Replicas
 function rebuildReplicas() {
   let rebuilt = 0;
   log('--- Rebuilding replicas ---', 'dm');
@@ -536,7 +532,7 @@ function rebuildReplicas() {
   renderNodes();
 }
 
-// ── Auto-heartbeat every 15 seconds ──────────────────────────
+// Auto-heartbeat every 15 seconds
 setInterval(() => {
   const dead = window.nodes.filter(n => n.status === 'offline');
   if (dead.length) {
@@ -544,7 +540,7 @@ setInterval(() => {
   }
 }, 15000);
 
-// ── Expose globals for inline override script ─────────────────
+// Expose globals for inline override script
 window.log          = log;
 window.toast        = toast;
 window.syncNode     = syncNode;
@@ -552,5 +548,5 @@ window.renderNodes  = renderNodes;
 window.deleteNode   = deleteNode;
 window.deleteFile   = deleteFile;
 
-// ── Init ──────────────────────────────────────────────────────
+// Init
 renderNodes();
