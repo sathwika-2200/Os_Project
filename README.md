@@ -1,57 +1,41 @@
-# 🏢 Distributed File System (DFS) - OS Project
+# Distributed File System (OS Project)
 
-![Datacenter UI](style.css)
+This is a college project simulating a Distributed File System (DFS). It shows how data is stored across multiple server nodes and how the system handles node crashes without losing files.
 
-A robust, multi-node storage engine simulation built to demonstrate core Operating System principles including **data availability, consistency, and fault tolerance**. 
+## Project Features
 
-This project bridges a low-level C backend with a premium, Vercel-style Enterprise Light Mode web dashboard, simulating how modern cloud architectures handle multi-node replication and catastrophic network failures.
+*   **Node Management:** Keeps track of 5 different server nodes. You can crash or recover them to test the system.
+*   **File Replication:** Every file you write is copied to 3 different nodes automatically.
+*   **Fault Tolerance:** If a node crashes, you can run a rebuild command to copy the lost data to other online nodes so nothing is lost.
+*   **Web Dashboard:** A clean HTML/JS interface that shows the server rack, node status, and file transfers visually.
 
-## 🌟 Key Features
+## How to Run the Project
 
-*   **Node Manager:** Dynamically maintains network topology and tracks the status (Online/Offline) of up to 5 independent server nodes.
-*   **Replication Engine (RF=3):** Automatically duplicates every written file across at least three distinct physical nodes, ensuring no single point of failure.
-*   **Fault Tolerance & Recovery:** Continuously monitors network health via heartbeat checks. If a node crashes, the system instantly triggers an automated Rebuild Protocol to copy data to healthy nodes.
-*   **Interactive Datacenter Dashboard:** A pristine web-based UI that visually represents the network as physical Server Blades within a Datacenter Rack, complete with data-flow animations and physical disk capacity indicators.
+The project has two parts: the C code that handles the backend logic, and the Web frontend for the visual dashboard. You need to run both to see it work.
 
-## 🛠️ Technology Stack
-
-*   **Core Logic:** `C` (Standard Library, GCC Compiler)
-*   **Frontend Visualization:** `HTML5`, `CSS3`, `Vanilla JS`
-*   **Version Control:** `Git` & `GitHub`
-
-## 🚀 How to Run Locally
-
-Because this project is split into a C engine and a Web visualization, you need to run both components.
-
-### 1. Compile and Run the C Backend
-The backend handles the core logic, memory management, and replication math.
-1. Open a terminal in the project directory.
-2. Compile the code using GCC:
+### 1. Run the C Program
+1. Open your terminal in the project folder.
+2. Compile the C files:
    ```bash
    gcc main.c node_manager.c replication.c fault_tolerance.c -o dfs
    ```
-3. Run the executable:
+3. Run it:
    ```bash
    ./dfs.exe
    ```
 
-### 2. Launch the Web Dashboard
-The frontend reads the simulated state and provides a beautiful interactive interface.
-1. Open a new terminal in the project directory.
-2. Start a local Python HTTP server:
+### 2. View the Web Dashboard
+1. Open a second terminal in the project folder.
+2. Start a Python local server:
    ```bash
    python -m http.server 8000
    ```
-3. Open your browser and navigate to: `http://localhost:8000`
+3. Open your web browser and go to: `http://localhost:8000`
 
-## 📂 Module Breakdown
-
-*   `main.c`: The entry point and interactive CLI menu.
-*   `dfs.h`: Core structs, macros, and function prototypes.
-*   `node_manager.c`: Handles network initialization and crash simulations.
-*   `replication.c`: Manages the 3-factor file distribution algorithm.
-*   `fault_tolerance.c`: Handles the heartbeat checks and replica rebuilding logic.
-*   `index.html` / `style.css` / `script.js`: The Enterprise Light Mode web dashboard.
-
----
-*Built for the Operating Systems course curriculum.*
+## Files Included
+*   `dfs.h`: Header file with all the structs and function definitions.
+*   `main.c`: The main CLI menu and entry point.
+*   `node_manager.c`: Code for adding, crashing, and recovering nodes.
+*   `replication.c`: Code for writing and reading files.
+*   `fault_tolerance.c`: Code for the heartbeat checks and rebuilding lost replicas.
+*   `index.html`, `style.css`, `script.js`: The frontend web interface files.
