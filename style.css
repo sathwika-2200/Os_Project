@@ -23,7 +23,7 @@ body {
 }
 
 header {
-  height: 70px;
+  height: 90px !important;
   background: var(--panel);
   border-bottom: 2px solid var(--accent);
   box-shadow: 0 0 15px var(--accent-glow);
@@ -33,6 +33,11 @@ header {
   padding: 0 2rem;
   z-index: 100;
 }
+
+.logo { display: flex; align-items: center; gap: 1.25rem; }
+
+.logo h1 { font-size: 1.4rem; font-weight: 800; letter-spacing: -0.02em; line-height: 1.2; }
+.logo p { font-size: 0.75rem; color: var(--text-dim); margin-top: 2px; }
 
 .logo-box {
   width: 32px; height: 32px; background: transparent;
