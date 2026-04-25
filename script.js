@@ -407,6 +407,9 @@ function writeFile() {
     return;
   }
 
+  // Load-Aware Routing: Sort online nodes by disk usage (least loaded first)
+  online.sort((a, b) => a.files.length - b.files.length);
+
   const targets = online.slice(0, Math.min(REPLICATION_FACTOR, online.length));
   targets.forEach(n => {
     if (!n.files.includes(fname)) { n.files.push(fname); n.load = Math.min(95, n.load + 8); }

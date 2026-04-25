@@ -5,7 +5,7 @@ This is a college project simulating a Distributed File System (DFS). It shows h
 ## Project Features
 
 *   **Node Management:** Keeps track of 5 different server nodes. You can crash or recover them to test the system.
-*   **File Replication:** Every file you write is copied to 3 different nodes automatically.
+*   **Load-Aware Replication:** Every file you write is copied to 3 different nodes automatically. The system intelligently picks the servers with the most free space to balance the network load!
 *   **Fault Tolerance:** If a node crashes, you can run a rebuild command to copy the lost data to other online nodes so nothing is lost.
 *   **Web Dashboard:** A clean HTML/JS interface that shows the server rack, node status, and file transfers visually.
 

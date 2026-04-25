@@ -14,6 +14,7 @@ The system is divided into three main parts:
 *   **Module 2: Replication Engine**
     *   Handles writing files to the network.
     *   Uses a Replication Factor of 3 (RF=3), meaning every file is saved on three different nodes.
+    *   **Load-Aware Data Routing:** Before saving a file, the system calculates the current disk load of all active servers and intentionally routes the data to the nodes with the most free space (Load Balancing).
     *   Handles reading files by checking which nodes have the file and picking an online one.
 
 *   **Module 3: Fault Tolerance & Recovery**

@@ -50,17 +50,37 @@ void rep_write_file(const char *filename, const char *content)
         return;
     }
 
-    /* collect online nodes */
-    Node *targets[MAX_NODES];
-    int  target_count = 0;
+    /* collect ALL online nodes */
+    Node *online_nodes[MAX_NODES];
+    int  online_count = 0;
 
-    for (int i = 0; i < g_node_count && target_count < REPLICATION_FACTOR; i++)
-        if (g_nodes[i].status == STATUS_ONLINE)
-            targets[target_count++] = &g_nodes[i];
+    for (int i = 0; i < g_node_count; i++) {
+        if (g_nodes[i].status == STATUS_ONLINE) {
+            online_nodes[online_count++] = &g_nodes[i];
+        }
+    }
 
-    if (target_count == 0) {
+    if (online_count == 0) {
         LOG_ERR("Write FAILED - no nodes online.");
         return;
+    }
+
+    /* Load-Aware Routing: Sort nodes by current storage load (ascending) */
+    for (int i = 0; i < online_count - 1; i++) {
+        for (int j = i + 1; j < online_count; j++) {
+            if (online_nodes[i]->file_count > online_nodes[j]->file_count) {
+                Node *temp = online_nodes[i];
+                online_nodes[i] = online_nodes[j];
+                online_nodes[j] = temp;
+            }
+        }
+    }
+
+    /* Pick up to REPLICATION_FACTOR least-loaded nodes */
+    Node *targets[MAX_NODES];
+    int target_count = 0;
+    for (int i = 0; i < online_count && target_count < REPLICATION_FACTOR; i++) {
+        targets[target_count++] = online_nodes[i];
     }
 
     /* create or update registry entry */
