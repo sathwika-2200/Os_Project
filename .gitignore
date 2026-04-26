@@ -1,0 +1,12 @@
+# Binaries
+*.exe
+*.o
+*.out
+dfs
+
+# VS Code settings (Optional, but included here for your setup)
+# .vscode/
+
+# OS generated files
+.DS_Store
+Thumbs.db

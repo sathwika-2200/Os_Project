@@ -20,16 +20,16 @@ void ft_heartbeat_check(void)
 
     for (int i = 0; i < g_node_count; i++) {
         Node *n = &g_nodes[i];
-        char msg[128];
+        char msg[256];
 
         if (n->status == STATUS_ONLINE) {
             snprintf(msg, sizeof(msg),
-                     "Heartbeat OK  ← %s  [load: %d%%  files: %d]",
+                     "Heartbeat OK  ← %.7s  [load: %d%%  files: %d]",
                      n->id, n->load, n->file_count);
             LOG_OK(msg);
         } else {
             snprintf(msg, sizeof(msg),
-                     "No heartbeat  ← %s  - NODE DOWN!", n->id);
+                     "No heartbeat  ← %.7s  - NODE DOWN!", n->id);
             LOG_ERR(msg);
             dead++;
         }
@@ -106,13 +106,13 @@ void ft_rebuild_replicas(void)
 
             /* register the new replica location */
             if (fe->replica_count < REPLICATION_FACTOR) {
-                strncpy(fe->replica_nodes[fe->replica_count++],
-                        cand->id, sizeof(fe->replica_nodes[0]) - 1);
+                snprintf(fe->replica_nodes[fe->replica_count++],
+                         sizeof(fe->replica_nodes[0]), "%.7s", cand->id);
             }
 
-            char msg[128];
+            char msg[MAX_FILENAME + 64];
             snprintf(msg, sizeof(msg),
-                     "Rebuilt replica of '%s' -> %s",
+                     "Rebuilt replica of '%.63s' -> %.7s",
                      fe->filename, cand->id);
             LOG_OK(msg);
 
@@ -121,9 +121,9 @@ void ft_rebuild_replicas(void)
         }
 
         if (needed > 0) {
-            char msg[128];
+            char msg[MAX_FILENAME + 128];
             snprintf(msg, sizeof(msg),
-                     "Warning: '%s' still under-replicated (%d shortage). "
+                     "Warning: '%.63s' still under-replicated (%d shortage). "
                      "Not enough online nodes.",
                      fe->filename, needed);
             LOG_WARN(msg);

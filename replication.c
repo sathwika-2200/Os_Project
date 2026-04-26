@@ -101,8 +101,8 @@ void rep_write_file(const char *filename, const char *content)
     /* replicate to each target node */
     for (int i = 0; i < target_count; i++) {
         node_add_file(targets[i], filename);
-        strncpy(fe->replica_nodes[fe->replica_count++],
-                targets[i]->id, sizeof(fe->replica_nodes[0]) - 1);
+        snprintf(fe->replica_nodes[fe->replica_count++],
+                 sizeof(fe->replica_nodes[0]), "%s", targets[i]->id);
     }
 
     /* build replica list string for log */
@@ -137,9 +137,9 @@ void rep_read_file(const char *filename)
     for (int i = 0; i < fe->replica_count; i++) {
         Node *n = nm_find_node(fe->replica_nodes[i]);
         if (n && n->status == STATUS_ONLINE && node_has_file(n, filename)) {
-            char msg[256];
+            char msg[MAX_FILENAME + MAX_CONTENT + 64];
             snprintf(msg, sizeof(msg),
-                     "Read '%s' served by %s  ->  \"%s\"",
+                     "Read '%.63s' served by %.7s  ->  \"%.255s\"",
                      filename, n->id, fe->content);
             LOG_OK(msg);
             return;
@@ -216,9 +216,9 @@ void rep_check_consistency(void)
             Node *n = nm_find_node(fe->replica_nodes[r]);
             if (!n) continue;
             if (n->status == STATUS_ONLINE && !node_has_file(n, fe->filename)) {
-                char msg[128];
+                char msg[MAX_FILENAME + 80];
                 snprintf(msg, sizeof(msg),
-                         "Inconsistency: '%s' missing from %s (should be there).",
+                         "Inconsistency: '%.63s' missing from %.7s (should be there).",
                          fe->filename, n->id);
                 LOG_WARN(msg);
                 issues++;
