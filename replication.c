@@ -29,14 +29,17 @@ static int node_has_file(Node *n, const char *filename)
 }
 
 /* -- Internal helper: add filename to a node's file list ------- */
-static void node_add_file(Node *n, const char *filename)
+static void node_add_file(Node *n, const char *filename, const char *content)
 {
     if (n->file_count >= MAX_FILES) return;
     if (node_has_file(n, filename))  return;
-    strncpy(n->files[n->file_count++], filename, MAX_FILENAME - 1);
-    /* bump simulated load */
-    n->load += 8;
-    if (n->load > 95) n->load = 95;
+    
+    /* Physical write */
+    if (store_write(n->id, filename, content)) {
+        strncpy(n->files[n->file_count++], filename, MAX_FILENAME - 1);
+        /* Realistic load calculation: percentage of max files used */
+        n->load = (n->file_count * 100) / MAX_FILES;
+    }
 }
 
 /* -- rep_write_file ---------------------------------------------
@@ -65,16 +68,13 @@ void rep_write_file(const char *filename, const char *content)
         return;
     }
 
-    /* Load-Aware Routing: Sort nodes by current storage load (ascending) */
-    for (int i = 0; i < online_count - 1; i++) {
-        for (int j = i + 1; j < online_count; j++) {
-            if (online_nodes[i]->file_count > online_nodes[j]->file_count) {
-                Node *temp = online_nodes[i];
-                online_nodes[i] = online_nodes[j];
-                online_nodes[j] = temp;
-            }
-        }
+    /* Scalable Load-Aware Routing: Standard Library qsort (O(n log n)) */
+    int compare_nodes(const void *a, const void *b) {
+        Node *na = *(Node **)a;
+        Node *nb = *(Node **)b;
+        return na->load - nb->load;
     }
+    qsort(online_nodes, online_count, sizeof(Node *), compare_nodes);
 
     /* Pick up to REPLICATION_FACTOR least-loaded nodes */
     Node *targets[MAX_NODES];
@@ -100,7 +100,7 @@ void rep_write_file(const char *filename, const char *content)
 
     /* replicate to each target node */
     for (int i = 0; i < target_count; i++) {
-        node_add_file(targets[i], filename);
+        node_add_file(targets[i], filename, content);
         snprintf(fe->replica_nodes[fe->replica_count++],
                  sizeof(fe->replica_nodes[0]), "%s", targets[i]->id);
     }
@@ -117,6 +117,9 @@ void rep_write_file(const char *filename, const char *content)
              "'%s' written -> replicated to [%s]  (factor=%d)",
              filename, rlist, fe->replica_count);
     LOG_OK(msg);
+
+    /* Persistent Registry: Save metadata to disk */
+    rep_save_registry();
 }
 
 /* -- rep_read_file ----------------------------------------------
@@ -137,12 +140,15 @@ void rep_read_file(const char *filename)
     for (int i = 0; i < fe->replica_count; i++) {
         Node *n = nm_find_node(fe->replica_nodes[i]);
         if (n && n->status == STATUS_ONLINE && node_has_file(n, filename)) {
-            char msg[MAX_FILENAME + MAX_CONTENT + 64];
-            snprintf(msg, sizeof(msg),
-                     "Read '%.63s' served by %.7s  ->  \"%.255s\"",
-                     filename, n->id, fe->content);
-            LOG_OK(msg);
-            return;
+            char file_buf[MAX_CONTENT];
+            if (store_read(n->id, filename, file_buf, sizeof(file_buf))) {
+                char msg[MAX_FILENAME + MAX_CONTENT + 64];
+                snprintf(msg, sizeof(msg),
+                         "Read '%.63s' served by %.7s  ->  \"%.255s\"",
+                         filename, n->id, file_buf);
+                LOG_OK(msg);
+                return;
+            }
         }
     }
 
@@ -169,7 +175,7 @@ void rep_sync_node(const char *node_id)
         for (int r = 0; r < fe->replica_count; r++) {
             if (strcmp(fe->replica_nodes[r], node_id) == 0) {
                 if (!node_has_file(n, fe->filename)) {
-                    node_add_file(n, fe->filename);
+                    node_add_file(n, fe->filename, fe->content);
                     restored++;
                 }
                 break;
@@ -271,4 +277,50 @@ void rep_show_map(void)
         printf("\n");
     }
     printf("\n");
+}
+
+/* -- Registry Persistence --------------------------------------- */
+
+#define REGISTRY_FILE "storage/registry.dat"
+
+void rep_save_registry(void)
+{
+    FILE *f = fopen(REGISTRY_FILE, "wb");
+    if (!f) return;
+
+    /* Write count and array */
+    fwrite(&g_file_count, sizeof(int), 1, f);
+    fwrite(g_files, sizeof(FileEntry), g_file_count, f);
+    fclose(f);
+}
+
+void rep_load_registry(void)
+{
+    FILE *f = fopen(REGISTRY_FILE, "rb");
+    if (!f) return;
+
+    if (fread(&g_file_count, sizeof(int), 1, f) == 1) {
+        fread(g_files, sizeof(FileEntry), g_file_count, f);
+        
+        /* Also restore filenames to node structures */
+        for (int i = 0; i < g_file_count; i++) {
+            FileEntry *fe = &g_files[i];
+            for (int r = 0; r < fe->replica_count; r++) {
+                Node *n = nm_find_node(fe->replica_nodes[r]);
+                if (n && n->file_count < MAX_FILES) {
+                    /* check if node already knows about it */
+                    int has = 0;
+                    for(int k=0; k<n->file_count; k++) 
+                        if(strcmp(n->files[k], fe->filename)==0) { has=1; break; }
+                    
+                    if(!has) {
+                        strncpy(n->files[n->file_count++], fe->filename, MAX_FILENAME-1);
+                        n->load = (n->file_count * 100) / MAX_FILES;
+                    }
+                }
+            }
+        }
+        LOG_INFO("Registry loaded from disk - system state restored.");
+    }
+    fclose(f);
 }

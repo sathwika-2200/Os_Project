@@ -88,6 +88,8 @@ int main(void)
 {
     /* -- initialise -- */
     nm_init_nodes();
+    rep_load_registry();
+    ft_start_heartbeat_thread();
     print_banner();
 
     char choice_buf[16];

@@ -25,6 +25,9 @@ void nm_init_nodes(void)
     g_node_count = 0;
     s_next_id    = 1;
 
+    /* Ensure physical storage root exists */
+    store_ensure_dir("storage");
+
     int default_loads[] = { 22, 38, 15, 55, 10 };
 
     for (int i = 0; i < 5; i++) {
@@ -34,6 +37,11 @@ void nm_init_nodes(void)
         n->file_count = 0;
         n->load       = default_loads[i];
         memset(n->files, 0, sizeof(n->files));
+
+        /* Ensure node directory exists */
+        char path[32];
+        snprintf(path, sizeof(path), "storage/%s", n->id);
+        store_ensure_dir(path);
     }
 
     char msg[64];
@@ -74,6 +82,11 @@ void nm_add_node(void)
     char msg[64];
     snprintf(msg, sizeof(msg), "Node %s joined the network.", n->id);
     LOG_OK(msg);
+
+    /* Create physical directory for new node */
+    char path[32];
+    snprintf(path, sizeof(path), "storage/%s", n->id);
+    store_ensure_dir(path);
 }
 
 /* -- nm_crash_node ----------------------------------------------
@@ -210,4 +223,53 @@ void nm_show_nodes(void)
            g_node_count,
            CLR_GREEN, online, CLR_DIM,
            CLR_RED,   offline, CLR_RESET);
+}
+
+/* -- Storage Utilities ---------------------------------------- */
+
+void store_ensure_dir(const char *path)
+{
+    if (mkdir(path, 0777) == -1) {
+        if (errno != EEXIST) {
+            char msg[128];
+            snprintf(msg, sizeof(msg), "Failed to create directory: %s", path);
+            LOG_ERR(msg);
+        }
+    }
+}
+
+int store_write(const char *node_id, const char *filename, const char *content)
+{
+    char path[256];
+    snprintf(path, sizeof(path), "storage/%s/%s", node_id, filename);
+
+    FILE *f = fopen(path, "w");
+    if (!f) return 0;
+
+    fprintf(f, "%s", content);
+    fclose(f);
+    return 1;
+}
+
+int store_read(const char *node_id, const char *filename, char *buffer, int size)
+{
+    char path[256];
+    snprintf(path, sizeof(path), "storage/%s/%s", node_id, filename);
+
+    FILE *f = fopen(path, "r");
+    if (!f) return 0;
+
+    if (fgets(buffer, size, f)) {
+        /* done */
+    }
+    fclose(f);
+    return 1;
+}
+
+int store_count_files(const char *node_id)
+{
+    /* Simplified: for simulation, we can just return the actual file count 
+       In a real system, we'd use opendir/readdir */
+    Node *n = nm_find_node(node_id);
+    return n ? n->file_count : 0;
 }

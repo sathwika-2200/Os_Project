@@ -1,12 +1,11 @@
-# Binaries
+# Build artifacts
 *.exe
 *.o
-*.out
-dfs
+*.obj
 
-# VS Code settings (Optional, but included here for your setup)
-# .vscode/
+# Storage data
+storage/
+registry.dat
 
-# OS generated files
-.DS_Store
-Thumbs.db
+# VS Code
+.vscode/

@@ -8,6 +8,20 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <pthread.h>
+#include <errno.h>
+
+#ifdef _WIN32
+    #include <direct.h>
+    #include <windows.h>
+    #define mkdir(path, mode) _mkdir(path)
+    #define sleep_ms(ms) Sleep(ms)
+#else
+    #include <unistd.h>
+    #define sleep_ms(ms) usleep((ms) * 1000)
+#endif
 
 /* -- Constants ------------------------------------------------ */
 #define MAX_NODES          10
@@ -89,9 +103,18 @@ void rep_sync_node(const char *node_id);
 void rep_sync_all(void);
 void rep_check_consistency(void);
 void rep_show_map(void);
+void rep_save_registry(void);
+void rep_load_registry(void);
 
 /* -- Module 3: Fault Tolerance -------------------------------- */
 void ft_heartbeat_check(void);
 void ft_rebuild_replicas(void);
+void ft_start_heartbeat_thread(void);
+
+/* -- Storage Utilities ---------------------------------------- */
+void store_ensure_dir(const char *path);
+int  store_write(const char *node_id, const char *filename, const char *content);
+int  store_read(const char *node_id, const char *filename, char *buffer, int size);
+int  store_count_files(const char *node_id);
 
 #endif /* DFS_H */

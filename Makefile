@@ -17,7 +17,7 @@ endif
 all: $(TARGET)
 
 $(TARGET): $(OBJS)
-	$(CC) $(CFLAGS) -o $@ $^
+	$(CC) $(CFLAGS) -o $@ $^ -lpthread
 
 %.o: %.c dfs.h
 	$(CC) $(CFLAGS) -c $< -o $@
