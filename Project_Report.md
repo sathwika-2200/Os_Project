@@ -2,8 +2,8 @@
 
 ## 1. Introduction
 *   **Project Title:** Distributed File System with Load-Aware Routing & Fault Tolerance
-*   **Student Name(s):** [INSERT NAME HERE]
-*   **Roll Number(s):** [INSERT ROLL NUMBER HERE]
+*   **Student Name(s):** Sathwika Mattipelli
+*   **Roll Number(s):** R324ESA19
 
 ---
 
